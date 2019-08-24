@@ -8,55 +8,67 @@ public class PlayTetris implements Runnable {
     PlayTetris(Window window) {
         this.gamepanel = window.getAnimation().getGamePanel();
         this.window = window;
-        colors = window.getAnimation().getGamePanel().getTab();
+        this.colors = window.getAnimation().getGamePanel().getTab();
     }
     @Override
     public void run() {
        if (window.isFirst()) {
-           for(int i = 0 ; i < 12 ; i++){
-               for( int j = 0 ; j < 22 ; j++){
-                   colors[i][j] = Color.WHITE;
-               }
-           }
-           gamepanel.nextBloc();
-           gamepanel.drawShape();
-           window.setFirst(false);
+            initNewGame();
         }
        while ( window.isGo()) {
            while (gamepanel.nothingUnder() && window.isGo()) {
-               gamepanel.lowerShape();
-               gamepanel.drawShape();
-               try {
-                   Thread.sleep(window.getAnimation().getSleep());
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               }
+                lowerTheBloc();
            }
+           updateScoreLevelLinesBloc();
            if (window.isGo()) {
-               int lines = gamepanel.countCompleteLines();
-               window.getAnimation().setScore(window.getAnimation().getScore() + gamepanel.scoreUpdate(lines));
-               window.getAnimation().setLevel(window.getAnimation().getScore() / 5000 + 1);
-               window.getAnimation().setSleep(300 - ((window.getAnimation().getLevel() - 1) * 25));
-               window.getAnimation().repaint();
-
-               gamepanel.nextBloc();
-               if (gamepanel.lost() && window.isGo()) {
-                   gamepanel.setLost(true);
-                   gamepanel.repaint();
-                   window.setGo(false);
-               }
-               gamepanel.drawShape();
+               checkLost();
                try {
-                   Thread.sleep(window.getAnimation().getSleep());
+                   Thread.sleep(window.getAnimation().getSleep() - ((window.getAnimation().getLevel() - 1) * 25));
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
            }
        }
-       if ( gamepanel.lost() && window.isGo() ){
-           gamepanel.setLost(true);
-           gamepanel.repaint();
-           window.setGo(false);
-       }
+    }
+    private void checkLost(){
+        if (gamepanel.lost() && window.isGo()) {
+            gamepanel.setLost(true);
+            gamepanel.repaint();
+            window.setGo(false);
+        }
+        gamepanel.drawShape();
+    }
+    private void initNewGame(){
+        for(int i = 0 ; i < 12 ; i++){
+            for( int j = 0 ; j < 22 ; j++){
+                colors[i][j] = Color.WHITE;
+            }
+        }
+        gamepanel.nextBloc();
+        gamepanel.drawShape();
+        window.setFirst(false);
+        try {
+            Thread.sleep(window.getAnimation().getSleep() - ((window.getAnimation().getLevel() - 1) * 25));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    private void lowerTheBloc(){
+        gamepanel.lowerShape();
+        gamepanel.drawShape();
+        try {
+            Thread.sleep(window.getAnimation().getSleep() - ((window.getAnimation().getLevel() - 1) * 25));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+    private void updateScoreLevelLinesBloc(){
+        int lines = gamepanel.countCompleteLines();
+        window.getAnimation().setLines(window.getAnimation().getLines() + lines);
+        window.getAnimation().setScore(window.getAnimation().getScore() + gamepanel.scoreUpdate(lines));
+        window.getAnimation().setLevel(window.getAnimation().getLines() / 10 + 1);
+        window.getAnimation().repaint();
+        gamepanel.nextBloc();
     }
 }

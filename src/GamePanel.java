@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class GamePanel extends JPanel {
     private Window window;
@@ -13,6 +14,9 @@ public class GamePanel extends JPanel {
                 tab[i][j] = Color.WHITE;
             }
         }
+        this.addKeyListener(new KeyBoardListener(window));
+        this.setPreferredSize(new Dimension(240,440));
+        this.setBorder(BorderFactory.createEtchedBorder(Color.BLACK,Color.WHITE));
     }
     public void paintComponent(Graphics g){
         for(int i = 0 ; i < 12 ; i++){
@@ -35,8 +39,42 @@ public class GamePanel extends JPanel {
             window.getAnimation().getPause().setName("");
             window.getAnimation().getPause().setColor(Color.LIGHT_GRAY);
             window.getAnimation().getPause().repaint();
+            writeNewHighScore();
+            window.getRightPanel().getScorePanel().getTop5().requestFocus();
+            window.getRightPanel().getScorePanel().getTop5().repaint();
         }
     }
+    private void writeNewHighScore(){
+        int counter = 1;
+        boolean found = false;
+        FileReader filereader = new FileReader();
+        List<Joueur> joueurs;
+        joueurs = filereader.getJoueurs();
+        if ( joueurs.size() == 0 ){
+            String name = JOptionPane.showInputDialog(window.getRightPanel().getScorePanel().getTop5(),"Vous entrez dans le top 5, veuillez entrer votre nom : ", "Top 5 !",JOptionPane.QUESTION_MESSAGE);
+            joueurs.add(new Joueur(name,window.getAnimation().getScore(),window.getAnimation().getLines()));
+            found = true;
+        }
+        else {
+            for (int i = 0; i < joueurs.size(); i++) {
+                if (!found) {
+                    if (window.getAnimation().getScore() > joueurs.get(i).getScore()) {
+                        String name = JOptionPane.showInputDialog(window.getRightPanel().getScorePanel().getTop5(), "Vous entrez dans le top 5, veuillez entrer votre nom : ", "Top 5 !", JOptionPane.QUESTION_MESSAGE);
+                        joueurs.add(i, new Joueur(name, window.getAnimation().getScore(), window.getAnimation().getLines()));
+                        found = true;
+                    }
+                    counter++;
+                }
+                if (i >= 5) joueurs.remove(i);
+            }
+        }
+        if ( counter <= 5  && !found) {
+            String name = JOptionPane.showInputDialog(window.getRightPanel().getScorePanel().getTop5(),"Vous entrez dans le top 5, veuillez entrer votre nom : ", "Top 5 !",JOptionPane.QUESTION_MESSAGE);
+            joueurs.add(new Joueur(name,window.getAnimation().getScore(),window.getAnimation().getLines()));
+        }
+        FileWriter fileWriter = new FileWriter(joueurs);
+    }
+
     boolean nothingUnder(){
         int[] positionX = bloc.getPositionsX();
         int[] positionY = bloc.getPositionsY();
@@ -74,7 +112,6 @@ public class GamePanel extends JPanel {
             }
         }return under;
     }
-
     boolean lost(){
         int[] positionX = bloc.getPositionsX();
         int[] positionY = bloc.getPositionsY();
@@ -126,7 +163,7 @@ public class GamePanel extends JPanel {
         int[] positionX = bloc.getPositionsX();
         int[] positionY = bloc.getPositionsY();
         for ( int i = 0 ; i < 4 ; i++){
-            tab[positionX[i]][positionY[i]] = bloc.getColor();
+             tab[positionX[i]][positionY[i]] = bloc.getColor();
         }
         repaint();
     }
@@ -172,11 +209,6 @@ public class GamePanel extends JPanel {
         bloc.rotateBloc(this);
         drawShape();
     }
-
-    Color[][] getTab() {
-        return tab;
-    }
-
+    Color[][] getTab() { return tab; }
     void setLost(boolean lost) { this.lost = lost; }
-
 }

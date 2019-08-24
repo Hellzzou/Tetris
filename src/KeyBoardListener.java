@@ -22,7 +22,7 @@ public class KeyBoardListener implements KeyListener {
             if ( window.getAnimation().getGamePanel().nothingRight()) window.getAnimation().getGamePanel().moveRight();
         }
         if ( e.getKeyCode() == KeyEvent.VK_DOWN){
-            window.getAnimation().setSleep((300 - ((window.getAnimation().getLevel() - 1) * 25)) / 3);
+            window.getAnimation().setSleep(100);
         }
         if ( e.getExtendedKeyCode() == KeyEvent.VK_UP){
             window.getAnimation().getGamePanel().rotate();

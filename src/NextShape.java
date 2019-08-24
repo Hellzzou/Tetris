@@ -5,6 +5,11 @@ import java.util.Random;
 public class NextShape extends JPanel {
     private Bloc nextBloc;
 
+    NextShape() {
+        this.setPreferredSize(new Dimension(180,180));
+        this.setBorder(BorderFactory.createEtchedBorder(Color.BLACK,Color.WHITE));
+    }
+
     public void paintComponent(Graphics g){
         int shape = new Random().nextInt(7);
         nextBloc = new Bloc(shape,4,3);

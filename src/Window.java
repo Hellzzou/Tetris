@@ -2,8 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 
 class Window extends JFrame {
-    private AnimationPanel animation;
-    private RightPanel rightPanel = new RightPanel();
+    private AnimationPanel animation = new AnimationPanel(this);
+    private RightPanel rightPanel = new RightPanel(this);
+    private JSplitPane game = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, animation, rightPanel);
     private boolean go = false;
     private boolean first = true;
 
@@ -12,15 +13,14 @@ class Window extends JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        animation = new AnimationPanel(this);
-        animation.addKeyListener(new KeyBoardListener(this));
-        rightPanel.addKeyListener(new KeyBoardListener(this));
-        JSplitPane game = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, animation, rightPanel);
+        this.initSplitPane();
+        this.setContentPane(game);
+        this.setVisible(true);
+    }
+    private void initSplitPane(){
         game.setDividerLocation(300);
         game.setBackground(Color.BLACK);
         game.setDividerSize(7);
-        this.setContentPane(game);
-        this.setVisible(true);
     }
 
     boolean isGo() { return go; }
